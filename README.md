@@ -1,0 +1,2 @@
+# KintoneChatGPTPlugin
+入力フィールドの内容でChatGPTに問い合わせて結果を出力フィールドに書き込む単機能のプラグインです。
