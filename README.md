@@ -1,14 +1,21 @@
 # KintoneChatGPTPlugin
 入力フィールドの内容でChatGPTに問い合わせて結果を出力フィールドに書き込む単機能のプラグインです。
 
-## 初期設定
+## kintoneアプリの初期設定
 
-- ３つのフィールドを用意したアプリを作成してプラグインを適用してください
-    - 複数行テキスト（入力）
-    - 複数行テキスト（出力）
-    - スペース
+以下の３つのフィールドを設定したアプリを作成してください。
 
-## 設定項目
+- 複数行テキスト（入力）
+- 複数行テキスト（出力）
+- スペース
+
+## プラグインのインストール
+- [プラグインzipファイル](https://github.com/motohasystem/KintoneChatGPTPlugin/blob/main/dist/ChatGptPlugin_v0_1.zip) をダウンロードしてアプリに適用してください。
+
+
+## プラグインの設定
+
+プラグイン設定画面から、下記5つの項目を設定してください。
 
 - API Key
     - ChatGPT APIのAPI Tokenを指定してください。
@@ -28,3 +35,14 @@
 - 実行ボタン配置スペース選択
     - API呼び出しを実行するボタンを配置するスペースを選択してください。
 
+# License
+
+プレビュー＆インポートプラグインはMITライセンスの元で公開しています。
+This plugin is licensed under MIT license.
+
+Copyright (c) 2023 Daisuke Motohashi
+https://opensource.org/licenses/MIT
+
+# このプラグインについて
+
+このプラグインは株式会社モノサスの[キン担ラボ](https://www.monosus.co.jp/service/kintanlab/)活動の一環として作成しました。
