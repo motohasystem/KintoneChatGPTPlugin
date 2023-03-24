@@ -1,0 +1,24 @@
+.settings-heading {
+  padding: 1em 0;
+}
+
+.kintoneplugin-input-text {
+  width: 20em;
+}
+
+.block {
+  margin-top: 5px;
+}
+
+.field-evaluation {
+    background-color: #AAAAFF;
+}
+
+.field-reference {
+    background-color: #AAFFAA;
+}
+
+.breadcrumb-item-gaia {
+    text-decoration: none !important;
+}
+
