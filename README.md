@@ -10,7 +10,7 @@
 - スペース
 
 ## プラグインのインストール
-- [プラグインzipファイル](https://github.com/motohasystem/KintoneChatGPTPlugin/blob/main/dist/ChatGptPlugin_v0_1.zip) をダウンロードしてアプリに適用してください。
+- [プラグインzipファイル](https://github.com/motohasystem/KintoneChatGPTPlugin/blob/main/dist/)をダウンロードしてアプリに適用してください。
 
 
 ## プラグインの設定
