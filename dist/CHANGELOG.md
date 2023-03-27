@@ -1,8 +1,11 @@
 
 # Change log
 
+## [0.2] - 2023-03-27
+- Added individual prompt settings
+
 ## [0.1] - 2023-03-24
-first release
+- first release
 
 ### Added
 ### Changed

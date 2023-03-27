@@ -8,6 +8,7 @@ export class ChatGPTConnector {
     conf: ConfigDict | undefined
     api_key: string | undefined;
     static_prompt: string | undefined;
+    fc_unique_prompt: string | undefined;
     fc_input_field: string | undefined;
     fc_output_field: string | undefined;
     space_btn_field: string | undefined;
@@ -35,6 +36,7 @@ export class ChatGPTConnector {
 
         this.api_key = conf[CONSTANTS.API_KEY] as string
         this.static_prompt = conf[CONSTANTS.STATIC_PROMPT] as string
+        this.fc_unique_prompt = conf[CONSTANTS.UNIQUE_PROMPT] as string
         this.fc_input_field = conf[CONSTANTS.INPUT_FIELD] as string
         this.fc_output_field = conf[CONSTANTS.OUTPUT_FIELD] as string
         this.space_btn_field = conf[CONSTANTS.BTN_SPACE_FIELD] as string
@@ -62,13 +64,15 @@ export class ChatGPTConnector {
     run = () => {
         console.log('call chatGPT!')
 
-        if (this.fc_input_field == undefined || this.api_key == undefined) {
-            console.error(`どこかundefinedが残っています。${this.fc_input_field} / ${this.api_key}`)
+        if (this.fc_input_field == undefined || this.api_key == undefined || this.fc_unique_prompt == undefined) {
+            console.error(`どこかundefinedが残っています。${this.fc_input_field} / ${this.api_key} / ${this.fc_unique_prompt}`)
             return
         }
 
         const prompt = this.getFieldContent(this.fc_input_field)
-        this.request(`${this.static_prompt}\n${prompt}`)
+        const uniq_prompt = this.getFieldContent(this.fc_unique_prompt)
+        const connected_prompt = [this.static_prompt, uniq_prompt, prompt].filter((val) => { return val != undefined }).join('\n')
+        this.request(connected_prompt)
             .then((response: string) => {
                 console.log(response)
                 if (this.fc_output_field == undefined) {
@@ -77,6 +81,8 @@ export class ChatGPTConnector {
                 this.setFieldContent(this.fc_output_field, response)
             })
     }
+
+
 
     getFieldContent(fc: string) {
         const record = kintone.app.record.get() as any

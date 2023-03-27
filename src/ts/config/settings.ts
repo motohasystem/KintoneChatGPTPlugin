@@ -26,9 +26,19 @@ export class Settings {
             'label': '固定プロンプト'
             , 'desc': '入力として毎回渡す固定のプロンプトを記入してください。'
             , 'code': CONSTANTS.STATIC_PROMPT
-            , 'type': FieldType.Text
-            , 'accept': ['MULTI_LINE_TEXT']
-            , 'required': true
+            , 'type': FieldType.MultilineText
+            // , 'type': FieldType.Text
+            // , 'accept': ['MULTI_LINE_TEXT']
+            , 'required': false
+        }
+        , {
+            'label': 'レコード別プロンプト'
+            , 'desc': 'レコード別に指定するプロンプトフィールドを選択してください。'
+            , 'code': CONSTANTS.UNIQUE_PROMPT
+            , 'type': FieldType.Dropdown_FieldSelect
+            , 'accept': ['SINGLE_LINE_TEXT', 'MULTI_LINE_TEXT']
+            , 'default': CONSTANTS.EMPTY_LABEL
+            , 'required': false
         }
         , {
             'label': ''
