@@ -9,6 +9,9 @@ export const CONSTANTS = {
     // API Key
     , API_KEY: 'api_key'
 
+    // ChatGPT Model ID
+    , MODEL_ID: 'model_id'
+
     // 固定プロンプト
     , STATIC_PROMPT: 'static_prompt'
 
@@ -24,4 +27,10 @@ export const CONSTANTS = {
     // 実行ボタン配置スペース
     , BTN_SPACE_FIELD: 'btn_space_field'
 
+    // レコード編集モード
+    , FLAG_RECORD_MODIFIER: 'flag_record_modifier'
+    , LABELS_RECORD_MODIFIER: ['enable', 'disable']
+
+    // レスポンスの最長トークン
+    , NUMBER_MAX_TOKENS: 'NUMBER_MAX_TOKENS'
 };

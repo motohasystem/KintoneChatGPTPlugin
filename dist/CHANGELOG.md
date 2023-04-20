@@ -1,5 +1,7 @@
 
 # Change log
+## [0.3] - 2023-04-20
+- Use setProxyConfig() API to store authentication information
 
 ## [0.2] - 2023-03-27
 - Added individual prompt settings

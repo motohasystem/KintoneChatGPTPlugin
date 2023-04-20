@@ -21,14 +21,40 @@ export class Settings {
             , 'code': CONSTANTS.API_KEY
             , 'type': FieldType.Text
             , 'required': true
+            , 'secret': true
+            , 'URL': 'https://api.openai.com/v1/completions'
+            , 'method': 'POST'
+            , 'header': 'Authorization Bearer'
+        }
+        , {
+            'label': 'ChatGPTの利用モデル'
+            , 'desc': '利用モデル名を入力してください。デフォルトは "text-davinci-003" です。'
+            , 'code': CONSTANTS.MODEL_ID
+            , 'type': FieldType.Text
+            , 'default': 'text-davinci-003'
+            , 'required': true
+        }
+        , {
+            'label': 'MAX Tokens'
+            , 'desc': 'レスポンスの最大トークン長を指定してください。'
+            , 'code': CONSTANTS.NUMBER_MAX_TOKENS
+            , 'type': FieldType.Number
+            , 'default': '256'
+            , 'required': true
+        }
+        , {
+            'label': '実行ボタン配置スペース選択'
+            , 'desc': 'API呼び出しを実行するボタンを配置するスペースを選択してください。'
+            , 'code': CONSTANTS.BTN_SPACE_FIELD
+            , 'type': FieldType.Dropdown_FieldSelect
+            , 'accept': ['SPACER']
+            , 'required': true
         }
         , {
             'label': '固定プロンプト'
             , 'desc': '入力として毎回渡す固定のプロンプトを記入してください。'
             , 'code': CONSTANTS.STATIC_PROMPT
             , 'type': FieldType.MultilineText
-            // , 'type': FieldType.Text
-            // , 'accept': ['MULTI_LINE_TEXT']
             , 'required': false
         }
         , {
@@ -39,6 +65,15 @@ export class Settings {
             , 'accept': ['SINGLE_LINE_TEXT', 'MULTI_LINE_TEXT']
             , 'default': CONSTANTS.EMPTY_LABEL
             , 'required': false
+        }
+        , {
+            'label': 'レコード編集モード'
+            , 'desc': '有効にするとレコード全体を編集対象として書き換えるモードで動作します。その際、↓以降の設定は無効になります。よくわからない場合はdisableにしておいてください。'
+            , 'code': CONSTANTS.FLAG_RECORD_MODIFIER
+            , 'type': FieldType.Radio
+            , 'accept': CONSTANTS.LABELS_RECORD_MODIFIER
+            , 'default': CONSTANTS.LABELS_RECORD_MODIFIER[1]
+            , 'required': true
         }
         , {
             'label': ''
@@ -65,15 +100,6 @@ export class Settings {
             , 'code': CONSTANTS.OUTPUT_FIELD
             , 'type': FieldType.Dropdown_FieldSelect
             , 'accept': ['MULTI_LINE_TEXT']
-            , 'required': true
-        }
-        // スペーサー選択がまだ未実装
-        , {
-            'label': '実行ボタン配置スペース選択'
-            , 'desc': 'API呼び出しを実行するボタンを配置するスペースを選択してください。'
-            , 'code': CONSTANTS.BTN_SPACE_FIELD
-            , 'type': FieldType.Dropdown_FieldSelect
-            , 'accept': ['SPACER']
             , 'required': true
         }
     ]

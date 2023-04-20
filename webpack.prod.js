@@ -2,7 +2,7 @@
 const path = require('path');
 const KintonePlugin = require('@kintone/webpack-plugin-kintone-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const TerserPlugin = require("terser-webpack-plugin")
+const TerserPlugin = require("terser-webpack-plugin");
 const StatsPlugin = require('stats-webpack-plugin');
 
 // [定数] webpack の出力オプションを指定します

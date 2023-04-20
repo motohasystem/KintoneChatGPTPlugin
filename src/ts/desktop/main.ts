@@ -33,7 +33,7 @@ export type SettingValue = string | {} | []
     ], (event) => {
         console.log(event)
         const connector = new ChatGPTConnector(full_conf)
-        connector.setup()
+        connector.setup(PLUGIN_ID)
 
         return event;
     });
