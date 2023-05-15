@@ -1,13 +1,15 @@
 {
   "manifest_version": 1,
-  "version": "0.2.0",
+  "version": "0.4.0",
   "type": "APP",
   "name": {
-    "en": "DEBUGMODE_ChatGptPlugin"
+    "en": "ChatGptPlugin - kin-tan-lab",
+    "ja": "ChatGPT連携プラグイン - キン担ラボ"
   },
   "icon": "image/shadow_shark.png",
   "description": {
-    "en": "DEBUGMODE_ChatGptPlugin"
+    "en": "Specify fields for prompts and output result fields and write the results via ChatGPT.",
+    "ja": "プロンプト用フィールドと出力結果フィールドを指定して、ChatGPTを経由した結果を書き出します。"
   },
   "homepage_url": {
     "ja": "https://www.monosus.co.jp/service/kintanlab/",
@@ -16,33 +18,27 @@
   },
   "desktop": {
     "js": [
-      "https://localhost:7760/js/desktop.js"
+      "js/desktop.js"
     ],
     "css": [
       "css/51-modern-default.css",
-      "css/micromodal-outside.css",
-      "https://localhost:7760/css/desktop.css"
+      "css/desktop.css"
     ]
   },
   "config": {
     "html": "html/config.html",
     "js": [
-      "https://localhost:7760/js/config.js"
+      "js/config.js"
     ],
     "css": [
       "css/51-modern-default.css",
-      "https://localhost:7760/css/config.css"
+      "css/config.css"
     ],
     "required_params": [
       "config"
     ]
   },
   "mobile": {
-    "js": [
-      "js/mobile.js"
-    ],
-    "css": [
-      "css/mobile.css"
-    ]
   }
+
 }

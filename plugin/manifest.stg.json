@@ -40,12 +40,6 @@
     ]
   },
   "mobile": {
-    "js": [
-      "js/mobile.js"
-    ],
-    "css": [
-      "css/mobile.css"
-    ]
   }
 
 }

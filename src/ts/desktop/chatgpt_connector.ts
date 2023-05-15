@@ -2,9 +2,13 @@ import { Utils } from 'commonutils';
 import { ConfigDict } from 'plugin-parameters-helper';
 import { CONSTANTS } from '../constants';
 
-// import axios from 'axios'
+// import { Spinner } from 'spin.js';
+import 'bootstrap'
+import "../../scss/style.scss";
 
 export class ChatGPTConnector {
+    BUTTON_LABEL = 'ChatGPTに聞く'
+
     conf: ConfigDict | undefined
     // api_key: string | undefined;
     plugin_id: string | undefined
@@ -16,7 +20,11 @@ export class ChatGPTConnector {
     model_id: string | undefined;
     api_endpoint: string;
     flag_record_modifier: boolean;
-    max_tokens: number = 256
+    max_tokens: string = "256"
+
+    system_prompt: string | undefined
+    messages: { [key: string]: string }[] | undefined
+
 
     constructor(conf: ConfigDict) {
         this.flag_record_modifier = false
@@ -42,13 +50,19 @@ export class ChatGPTConnector {
         this.fc_input_field = conf[CONSTANTS.INPUT_FIELD] as string
         this.fc_output_field = conf[CONSTANTS.OUTPUT_FIELD] as string
         this.space_btn_field = conf[CONSTANTS.BTN_SPACE_FIELD] as string
-        this.max_tokens = conf[CONSTANTS.NUMBER_MAX_TOKENS] == undefined ? 256 : conf[CONSTANTS.NUMBER_MAX_TOKENS] as number
+        this.max_tokens = conf[CONSTANTS.NUMBER_MAX_TOKENS] == undefined ? "256" : conf[CONSTANTS.NUMBER_MAX_TOKENS] as string
 
         // レコード編集モードのフラグ
         this.flag_record_modifier = conf[CONSTANTS.FLAG_RECORD_MODIFIER] as string == CONSTANTS.LABELS_RECORD_MODIFIER[0]
 
         // ChatGPTのモデル名
         this.model_id = conf[CONSTANTS.MODEL_ID] as string
+
+        // systemプロンプト
+        this.system_prompt = conf[CONSTANTS.SYSTEM_PROMPT] as string
+
+        // user / assitantの会話
+        this.messages = conf[CONSTANTS.TABLE_FEWSHOTS_PROMPT] as { [key: string]: string }[]
     }
 
     // スペースフィールドにボタンを配置する
@@ -58,23 +72,41 @@ export class ChatGPTConnector {
         }
 
         const space_field = kintone.app.record.getSpaceElement(fc_btn_field)
+
+        // const spinner = Utils.buildElement({
+        //     tagName: 'span'
+        //     , className: 'spinner-grow spinner-grow-sm kintone_plugin_spinner'
+        //     , attrs: {
+        //         'role': 'status'
+        //         , 'id': 'spinner_in_button'
+        //         , 'aria-hidden': 'true'
+        //         // , 'style': 'display:none;'
+        //     }
+        // }) as HTMLElement
+        // spinner.style.display = "none"
+
         const btn = Utils.buildElement({
-            tagName: 'input'
-            , className: 'kintoneplugin-button-normal'
+            tagName: 'button'
+            , className: 'btn btn-primary'
             , attrs: {
-                'type': 'button'
-                , 'value': 'ChatGPTに聞く'
+                'id': 'button_request'
+                , 'type': 'button'
             }
+            , textContent: this.BUTTON_LABEL
+            // , childElements: [spinner]
         })
+
         btn.addEventListener('click', this.run)
         space_field?.appendChild(btn)
+        // space_field?.appendChild(spinner)
     }
 
-    run = () => {
+    run = async () => {
         console.log('call chatGPT!')
+        this.showSpinner()
 
-        if (this.fc_input_field == undefined || this.fc_unique_prompt == undefined) {
-            console.error(`どこかundefinedが残っています。${this.fc_input_field} / ${this.fc_unique_prompt}`)
+        if (this.fc_input_field == undefined) {
+            console.error(`必須設定に undefined が残っています。/ fc_input_field: ${this.fc_input_field}`)
             return
         }
 
@@ -92,12 +124,24 @@ export class ChatGPTConnector {
             }
         })(this.flag_record_modifier)
 
-        const uniq_prompt = this.getFieldContent(this.fc_unique_prompt)
-        // const json_suggestor = "\n\nこのあとに空行をはさんで処理対象のjsonをつづけます。\n\n"
-        const connected_prompt = [this.static_prompt, uniq_prompt, prompt].filter((val) => { return val != undefined }).join('\n')
+        // // 2秒間待機する関数を定義
+        // function waitTwoSeconds() {
+        //     console.log(prompt)
+        //     return new Promise<void>(resolve => {
+        //         setTimeout(() => {
+        //             resolve();
+        //         }, 2000);
+        //     });
+        // }
 
-        // リクエスト実行と返り値の処理
-        this.request(connected_prompt)
+        // // 上記関数を呼び出し、2秒待機する
+        // await waitTwoSeconds()
+
+        // console.log('2 seconds have passed.');
+        // this.hideSpinner()
+
+        // // リクエスト実行と返り値の処理
+        this.request(prompt)
             .then((response) => {
                 console.log({ response })
                 if (this.fc_output_field == undefined) {
@@ -115,9 +159,19 @@ export class ChatGPTConnector {
                 }
                 else {
                     const result: any = JSON.parse(response[0])
-                    const text = result['choices'][0]['text']
+                    let text
+                    if ('choices' in result && result['choices'].length > 0 && 'message' in result['choices'][0]) {
+                        text = result['choices'][0]['message']['content']
+                    }
+                    else {
+                        text = response[0]
+                    }
                     this.setFieldContent(this.fc_output_field, text.replace(/^\n+/, ''))
                 }
+
+                return
+            }).finally(() => {
+                this.hideSpinner()
             })
     }
 
@@ -129,6 +183,7 @@ export class ChatGPTConnector {
             throw new Error('レコード情報が取得できません。')
         }
 
+        console.log({ record })
         const text = record.record[fc].value
         console.log({ text })
 
@@ -144,11 +199,12 @@ export class ChatGPTConnector {
     request(prompt: string) {
         console.log({ prompt })
 
+
         if (this.plugin_id == undefined) {
             throw new Error('プラグインIDが未定です')
         }
         const pluginId = this.plugin_id
-        const url = this.api_endpoint + '/completions'
+        const url = this.api_endpoint + '/chat/completions'
         const method = "POST"
         const headers = {
             'Content-Type': 'application/json',
@@ -158,43 +214,95 @@ export class ChatGPTConnector {
         if (this.model_id == undefined || this.model_id == "") {
             throw new Error(`指定されたChatGPTのモデル名[${this.model_id}]が不適切です。`)
         }
+        // const max_tokens = parseInt(this.max_tokens)
+
+        const messages = this.composeMessages(this.system_prompt, this.messages, prompt)
         const data = {
             "model": this.model_id,
-            "prompt": prompt,
-            "max_tokens": 1024,
-            "temperature": 0.7
+            "messages": messages,
+            // "max_tokens": max_tokens,
+            // "temperature": 0.7
         }
+        console.log({ data })
         return kintone.plugin.app.proxy(pluginId, url, method, headers, data)
-        // , (response) => {   // success
-        //     console.log({ response })
-        //     return response
-        // }
-        // , (error) => {   // failed
-        //     console.error(error);
-        //     return 'Error occurred while fetching response.';
-        // })
+    }
 
-        // try {
-        //     const response = await axios.post(this.api_endpoint + '/completions', {
-        //         "model": this.model_id,
-        //         "prompt": prompt,
-        //         "max_tokens": 1024,
-        //         "temperature": 0.7
-        //     }, {
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             // 'Authorization': 'Bearer ' + this.api_key
-        //         }
-        //     });
-        //     console.log({ response })
-        //     return response.data.choices[0].text.trim();
-        // } catch (error) {
-        //     console.error(error);
-        //     return 'Error occurred while fetching response.';
-        // }
+    // ChatCompletion に与えるmessagesを構築する
+    composeMessages(system: string | undefined, messages: { [key: string]: string }[] | undefined, prompt: string) {
+        if (system == undefined) {
+            system = ""
+        }
+
+        if (messages == undefined) {
+            messages = []
+        }
+
+        const chats = messages.map(msg => {
+            return {
+                "role": msg[CONSTANTS.TABLE_FEWSHOTS.role]
+                , "content": msg[CONSTANTS.TABLE_FEWSHOTS.content]
+            }
+        })
+
+        const conversations: typeof messages = [
+            { "role": "system", "content": system }
+            , ...chats
+            , { "role": "user", "content": prompt }
+        ]
+
+
+        return conversations
     }
 
 
+    // スピナーを動作させる関数
+    showSpinner() {
+        console.log('show spinner')
+
+        // 要素作成等初期化処理
+        if (document.getElementsByClassName('kintone-spinner').length === 0) {
+            const spin_div = Utils.buildElement({
+                tagName: 'div'
+                , className: 'spinner-grow text-primary kintone-spinner'
+                , attrs: {
+                    'role': 'status'
+                    , 'id': 'spinner_in_button'
+                    , 'aria-hidden': 'true'
+                    , 'style': 'position: fixed; top: 50%; left: 50%; z-index: 510;'
+                }
+            }) as HTMLElement
+            // spin_div.style.display = "none"
+
+            const spin_bg_div = Utils.buildElement({
+                tagName: 'div'
+                , className: 'kintone-spinner'
+                , attrs: {
+                    id: 'kintone-spin-bg'
+                    , style: "position: fixed; top: 0px; left: 0px; z-index: 500; width: 100%; height: 200%; background-color: #000; opacity: 0.5; filter: alpha(opacity=50); -ms-filter: alpha(opacity=50)"
+                }
+            })
+
+            // スピナー用要素をbodyにappend
+            document.getElementsByTagName('body')[0].append(spin_div, spin_bg_div);
+        };
+
+        // スピナー始動（表示）
+        const spinners = document.getElementsByClassName('kintone-spinner') as HTMLCollectionOf<HTMLElement>
+        Array.from(spinners).forEach(el => {
+            el.style.display = "block"
+        })
+
+    }
+
+    // スピナーを停止させる関数
+    hideSpinner() {
+        console.log('hide spinner')
+        // スピナー停止（非表示）
+        const spinners = document.getElementsByClassName('kintone-spinner') as HTMLCollectionOf<HTMLElement>
+        Array.from(spinners).forEach(el => {
+            el.style.display = "none"
+        })
+    };
 
 }
 

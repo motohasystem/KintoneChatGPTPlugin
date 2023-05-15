@@ -33,4 +33,17 @@ export const CONSTANTS = {
 
     // レスポンスの最長トークン
     , NUMBER_MAX_TOKENS: 'NUMBER_MAX_TOKENS'
+
+    // systemロールのプロンプト
+    , SYSTEM_PROMPT: 'system_prompt'
+
+    // fewshotを定義するテーブル
+    , TABLE_FEWSHOTS_PROMPT: 'table_fewshot_prompt'
+    // テーブルの各項目
+    , TABLE_FEWSHOTS: {
+        'role': '役割'
+        , 'content': 'プロンプト'
+    }
 };
+
+// export type fewshots_keys =  keyof typeof CONSTANTS.TABLE_FEWSHOTS
