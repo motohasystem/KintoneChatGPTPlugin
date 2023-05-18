@@ -1,12 +1,14 @@
 
 # Change log
 
-## [0.4] - 2023-05-12
+## [0.5] - 2023-05-18
+### Added
+- Added import/export buttons
 
+## [0.4] - 2023-05-12
 ### Changed
 - Changed API call from Complete to Chat
 - The model default was changed to gpt-3.5-turbo accordingly.
-
 
 ## [0.3] - 2023-04-20
 ### Changed

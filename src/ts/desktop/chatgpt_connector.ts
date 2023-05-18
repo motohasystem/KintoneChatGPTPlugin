@@ -1,10 +1,11 @@
-import { Utils } from 'commonutils';
+// import { Utils } from 'commonutils';
 import { ConfigDict } from 'plugin-parameters-helper';
 import { CONSTANTS } from '../constants';
 
 // import { Spinner } from 'spin.js';
 import 'bootstrap'
 import "../../scss/style.scss";
+import { Utils } from 'kintoneplugin-commonutils';
 
 export class ChatGPTConnector {
     BUTTON_LABEL = 'ChatGPTに聞く'

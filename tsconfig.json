@@ -70,13 +70,22 @@
     "skipLibCheck": true,                           /* Skip type checking of declaration files. */
     "forceConsistentCasingInFileNames": true,        /* Disallow inconsistently-cased references to the same file. */
     "paths": {
-        "commonutils": [
-            "../lib/KintoneCommonUtils.ts/src/index.ts"
+        // "commonutils": [
+        //     "../lib/KintoneCommonUtils.ts/src/index.ts"
+        // ],
+        "plugin-parameters-helper": [
+            "../lib/KintoneConfigBuilder.ts/src/index.ts"
         ],
-        "plugin-parameters-helper": ["../lib/KintoneConfigBuilder.ts/src/index.ts"]
-    },                                 /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
+        // "kintoneplugin-config-migrator": [
+        //     "../lib/KintonePluginConfigMigrator"
+        // ]
+    },
+    /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
+    "traceResolution": false
   },
 //   "files" : [
+//         "./node_modules/kintoneplugin-config-migrator/dist/types/index.d.ts",
+//         "./node_modules/kintoneplugin-config-migrator/dist/types/config-migrator.d.ts"
 //     "./node_modules/@kintone/dts-gen/kintone.d.ts"
 //     , "./src/ts/desktop/fields.d.ts"
 //   ],
