@@ -1,6 +1,13 @@
 
 # Change log
 
+## [1.0] - 2023-06-07
+### Changed
+- Organize items and comments on the settings screen
+
+### Removed
+- Removed the ability to edit records directly
+
 ## [0.5] - 2023-05-18
 ### Added
 - Added import/export buttons
