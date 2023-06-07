@@ -7,6 +7,11 @@ import 'bootstrap'
 import "../../scss/style.scss";
 import { Utils } from 'kintoneplugin-commonutils';
 
+import { Record } from '@kintone/rest-api-client/lib/client/types'
+import { KintoneRestAPIClient } from '@kintone/rest-api-client'
+import "@shin-chan/kypes";  // kintone types
+import { EmbeddingController, VectorizedDB } from './embedding_controller';
+
 export class ChatGPTConnector {
     BUTTON_LABEL = 'ChatGPTに聞く'
 
@@ -26,6 +31,10 @@ export class ChatGPTConnector {
     system_prompt: string | undefined
     messages: { [key: string]: string }[] | undefined
 
+    // embedding用の設定
+    appid_indexing: string | undefined
+    indexing_model_id: string | undefined
+    fieldcode_vectorized: string | undefined
 
     constructor(conf: ConfigDict) {
         this.flag_record_modifier = false
@@ -53,9 +62,6 @@ export class ChatGPTConnector {
         this.space_btn_field = conf[CONSTANTS.BTN_SPACE_FIELD] as string
         this.max_tokens = conf[CONSTANTS.NUMBER_MAX_TOKENS] == undefined ? "256" : conf[CONSTANTS.NUMBER_MAX_TOKENS] as string
 
-        // レコード編集モードのフラグ
-        this.flag_record_modifier = conf[CONSTANTS.FLAG_RECORD_MODIFIER] as string == CONSTANTS.LABELS_RECORD_MODIFIER[0]
-
         // ChatGPTのモデル名
         this.model_id = conf[CONSTANTS.MODEL_ID] as string
 
@@ -64,6 +70,12 @@ export class ChatGPTConnector {
 
         // user / assitantの会話
         this.messages = conf[CONSTANTS.TABLE_FEWSHOTS_PROMPT] as { [key: string]: string }[]
+
+        // embedding設定
+        this.appid_indexing = conf[CONSTANTS.APPID_INDEXING] as string  // 未定義の場合はembedding無効フラグとして扱う
+        console.log(this.appid_indexing)
+        this.indexing_model_id = conf[CONSTANTS.INDEXING_MODEL_ID] as string
+        this.fieldcode_vectorized = conf[CONSTANTS.FIELDCODE_VECTORIZED] as string
     }
 
     // スペースフィールドにボタンを配置する
@@ -73,18 +85,6 @@ export class ChatGPTConnector {
         }
 
         const space_field = kintone.app.record.getSpaceElement(fc_btn_field)
-
-        // const spinner = Utils.buildElement({
-        //     tagName: 'span'
-        //     , className: 'spinner-grow spinner-grow-sm kintone_plugin_spinner'
-        //     , attrs: {
-        //         'role': 'status'
-        //         , 'id': 'spinner_in_button'
-        //         , 'aria-hidden': 'true'
-        //         // , 'style': 'display:none;'
-        //     }
-        // }) as HTMLElement
-        // spinner.style.display = "none"
 
         const btn = Utils.buildElement({
             tagName: 'button'
@@ -124,22 +124,6 @@ export class ChatGPTConnector {
                 return this.getFieldContent(this.fc_input_field)
             }
         })(this.flag_record_modifier)
-
-        // // 2秒間待機する関数を定義
-        // function waitTwoSeconds() {
-        //     console.log(prompt)
-        //     return new Promise<void>(resolve => {
-        //         setTimeout(() => {
-        //             resolve();
-        //         }, 2000);
-        //     });
-        // }
-
-        // // 上記関数を呼び出し、2秒待機する
-        // await waitTwoSeconds()
-
-        // console.log('2 seconds have passed.');
-        // this.hideSpinner()
 
         // // リクエスト実行と返り値の処理
         this.request(prompt)
@@ -200,7 +184,6 @@ export class ChatGPTConnector {
     request(prompt: string) {
         console.log({ prompt })
 
-
         if (this.plugin_id == undefined) {
             throw new Error('プラグインIDが未定です')
         }
@@ -217,16 +200,135 @@ export class ChatGPTConnector {
         }
         // const max_tokens = parseInt(this.max_tokens)
 
-        const messages = this.composeMessages(this.system_prompt, this.messages, prompt)
-        const data = {
-            "model": this.model_id,
-            "messages": messages,
-            // "max_tokens": max_tokens,
-            // "temperature": 0.7
-        }
-        console.log({ data })
-        return kintone.plugin.app.proxy(pluginId, url, method, headers, data)
+        return this.getEmbeddings(
+            this.appid_indexing
+            , this.indexing_model_id
+            , this.fieldcode_vectorized
+            , prompt
+        ).then((prompt: string) => {
+            const messages = this.composeMessages(this.system_prompt, this.messages, prompt)
+            const data = {
+                "model": this.model_id,
+                "messages": messages,
+                // "max_tokens": max_tokens,
+                // "temperature": 0.7
+            }
+            console.log({ data })
+            return kintone.plugin.app.proxy(pluginId, url, method, headers, data)
+        })
+
     }
+
+    // embeddingする情報を、指定したappidのアプリから取得します
+    getEmbeddings(appid: string | undefined, model: string | undefined, fc_vectors: string | undefined, prompt: string = "") {
+        if (appid == undefined || model == undefined) {
+            console.warn(`getEmbeddings(): embedせずに実行します。(appid:${appid}, model:${model})`)
+            return Promise.resolve(prompt)
+        }
+
+        if (fc_vectors == undefined) {
+            throw new Error('getEmbeddings(): ベクトル格納フィールドが未指定です。')
+        }
+
+        const embeddedPrompt = this.getEmbeddedPrompt(appid, prompt, 3)
+        return Promise.resolve(embeddedPrompt)
+    }
+
+    // 指定したアプリからベクトル情報を取得して、systemプロンプトとして返します。
+    async getEmbeddedPrompt(appid: string, query_vector: string, embed_count: number = 3): Promise<string> {
+        console.log({ appid })
+        console.log({ query_vector })
+        console.log({ embed_count })
+
+        const embedding_prompt = await this.getAllRecords(appid).then((records: Record[]) => {
+            // 全件取得した状態から、1レコードずつベクトル演算する
+            console.log(records)
+
+            if (this.plugin_id == undefined) {
+                throw new Error(`getKnowledgesFromIndexingApp(): プラグインIDが未定義のままProxyを呼び出そうとしました。`)
+            }
+
+            const controller = new EmbeddingController(null)
+            controller.setProxyInfo(this.plugin_id)
+
+            const allKnowledges = records.map(record => {
+
+                if (this.fieldcode_vectorized != undefined && this.fieldcode_vectorized in record) {
+                    // フィールドが存在する場合
+                    const vectors: VectorizedDB = JSON.parse(record[this.fieldcode_vectorized].value as string)
+                    console.log({ vectors })
+                    return controller.pickupEmbeddings(query_vector, vectors, embed_count)
+                }
+                else {
+                    throw new Error(`指定したフィールド[${this.fieldcode_vectorized}]が指定したアプリ[${appid}]に存在しませんでした。設定を見直してください。`)
+                }
+            })
+
+            return Promise.all(allKnowledges)
+        }).then((allKnowledges) => {
+            const joined_prompts = allKnowledges.map((knowledges) => {
+                return knowledges.join('\n')
+            }).join('\n\n====\n\n')
+
+            return Promise.resolve(joined_prompts)
+        })
+
+        return [embedding_prompt, query_vector].join('\n\n====\n\n')
+    }
+
+
+    // commonutilsに入れたい
+    async getAllRecords(appid: string, query: string | undefined = undefined, limit: string = '500'): Promise<any[]> {
+        // クライアントの作成
+        const client = new KintoneRestAPIClient();
+
+        const allRecords: Record[] = []
+
+        let hasNext = true
+
+        // リクエストパラメータの設定
+        let last_record_id = '0'
+        while (hasNext) {
+
+            const params = {
+                app: appid,
+                query: ((last_record_id, query) => {
+                    if (query) {
+                        return `${query} and $id > ${last_record_id} order by $id asc limit ${limit}`
+                    }
+                    else {
+                        return `$id > ${last_record_id} order by $id asc limit ${limit}`
+                    }
+                })(last_record_id, query),
+                totalCount: true
+            };
+
+            // レコードの取得
+            const resp = await client.record.getRecords(params);
+            const { records, totalCount } = resp
+            console.log({ records });
+            console.log({ totalCount })
+
+            if (totalCount == null) {
+                throw new Error('getAllRecords(): totalCount に null が返りました。')
+            }
+
+            allRecords.push(...records)
+
+            if (parseInt(totalCount) == 0) {
+                hasNext = false
+                continue
+            }
+
+            const last_record = records[records.length - 1]
+            last_record_id = last_record['$id'].value as string
+        }
+
+        return allRecords;
+    }
+
+
+
 
     // ChatCompletion に与えるmessagesを構築する
     composeMessages(system: string | undefined, messages: { [key: string]: string }[] | undefined, prompt: string) {

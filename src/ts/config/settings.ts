@@ -11,18 +11,18 @@ export class Settings {
 
     static input: KintoneConfigSetting = [
         {
-            'label': 'ChatGPTの設定'
+            'label': 'OpenAI APIの設定'
             , 'desc': 'API呼び出しに必要な項目を指定します。'
             , 'type': FieldType.Label
         }
         , {
-            'label': 'API Key'
-            , 'desc': 'ChatGPT APIのAPI Tokenを指定してください。'
+            'label': 'API key'
+            , 'desc': 'API keyを指定してください。インデキシングにもここで指定したAPI Keyを利用します。'
             , 'code': CONSTANTS.API_KEY
             , 'type': FieldType.Text
             , 'required': true
             , 'secret': true
-            , 'URL': 'https://api.openai.com/v1/chat/completions'
+            , 'URL': ['https://api.openai.com/v1/chat/completions', 'https://api.openai.com/v1/embeddings']
             , 'method': 'POST'
             , 'header': 'Authorization Bearer'
         }
@@ -39,11 +39,11 @@ export class Settings {
             , 'desc': 'レスポンスの最大トークン長を指定してください。'
             , 'code': CONSTANTS.NUMBER_MAX_TOKENS
             , 'type': FieldType.Number
-            , 'default': '512'
+            , 'default': '1024'
             , 'required': true
         }
         , {
-            'label': '役割プロンプト'
+            'label': '役割プロンプト(system)'
             , 'desc': 'ChatGPTの役割を与えます。あなたはカウンセラーです。のような役割をプロンプトしてください。'
             , 'code': CONSTANTS.SYSTEM_PROMPT
             , 'type': FieldType.MultilineText
@@ -52,7 +52,7 @@ export class Settings {
             , 'required': false
         }
         , {
-            'label': '対話例プロンプト'
+            'label': '対話例プロンプト(user / assistant)'
             , 'desc': '会話の例をChatGPTに教えます。この項目が長くなる場合はMAX Tokensの値を増やしてください。'
             , 'code': CONSTANTS.TABLE_FEWSHOTS_PROMPT
             , 'type': FieldType.IncrementalTable
@@ -73,55 +73,10 @@ export class Settings {
             'label': ''
             , 'desc': '=============================================='
             , 'type': FieldType.Separator
-            , 'required': false
-        }
-        , {
-            'label': 'プラグインの動作設定'
-            , 'desc': 'ボタンの配置やレコード単位でプロンプトとして使用するフィールドなどを設定します。'
-            , 'type': FieldType.Label
-        }
-        , {
-            'label': '実行ボタン配置スペース選択'
-            , 'desc': 'API呼び出しを実行するボタンを配置するスペースを選択してください。'
-            , 'code': CONSTANTS.BTN_SPACE_FIELD
-            , 'type': FieldType.Dropdown_FieldSelect
-            , 'accept': ['SPACER']
-            , 'required': true
-        }
-        // , {
-        //     'label': '固定プロンプト'
-        //     , 'desc': '入力として毎回渡す固定のプロンプトを記入してください。'
-        //     , 'code': CONSTANTS.STATIC_PROMPT
-        //     , 'type': FieldType.MultilineText
-        //     , 'required': false
-        // }
-        // , {
-        //     'label': 'レコード別プロンプト'
-        //     , 'desc': 'レコード別に指定するプロンプトフィールドを選択してください。'
-        //     , 'code': CONSTANTS.UNIQUE_PROMPT
-        //     , 'type': FieldType.Dropdown_FieldSelect
-        //     , 'accept': ['SINGLE_LINE_TEXT', 'MULTI_LINE_TEXT']
-        //     , 'default': CONSTANTS.EMPTY_LABEL
-        //     , 'required': false
-        // }
-        , {
-            'label': '[danger] レコード編集モード'
-            , 'desc': '有効にするとレコード全体を編集対象として書き換えるモードで動作します。その際、↓以降の設定は無効になります。よくわからない場合はdisableにしておいてください。'
-            , 'code': CONSTANTS.FLAG_RECORD_MODIFIER
-            , 'type': FieldType.Radio
-            , 'accept': CONSTANTS.LABELS_RECORD_MODIFIER
-            , 'default': CONSTANTS.LABELS_RECORD_MODIFIER[1]
-            , 'required': true
-        }
-        , {
-            'label': ''
-            , 'desc': '=============================================='
-            , 'type': FieldType.Separator
-            , 'required': false
         }
         , {
             'label': 'kintoneのフィールド設定'
-            , 'desc': 'ChatGPTに問い合わせる入力フィールドと、回答を出力する出力フィールドを設定します。'
+            , 'desc': 'ChatGPTに問い合わせる入力フィールドと、回答を出力する出力フィールド、実行ボタン配置用のスペースIDを設定します。'
             , 'type': FieldType.Label
         }
         , {
@@ -139,6 +94,47 @@ export class Settings {
             , 'type': FieldType.Dropdown_FieldSelect
             , 'accept': ['MULTI_LINE_TEXT']
             , 'required': true
+        }
+        , {
+            'label': '実行ボタン配置スペース選択'
+            , 'desc': 'API呼び出しボタンを配置するスペースを選択してください。スペースにIDを指定していない場合、リストに出てこないのでご注意ください。'
+            , 'code': CONSTANTS.BTN_SPACE_FIELD
+            , 'type': FieldType.Dropdown_FieldSelect
+            , 'accept': ['SPACER']
+            , 'required': true
+        }
+        , {
+            'label': ''
+            , 'desc': '=============================================='
+            , 'type': FieldType.Separator
+        }
+        , {
+            'label': 'embedding設定'
+            , 'desc': 'embedding機能を利用する際の設定項目です。通常は設定不要です。利用方法については、キン担ラボまでお問い合わせください。'
+            , 'type': FieldType.Label
+        }
+
+        , {
+            'label': 'インデキシングアプリID'
+            , 'desc': 'ベクトル情報を格納しているアプリのIDを指定してください。'
+            , 'code': CONSTANTS.APPID_INDEXING
+            , 'type': FieldType.Number
+            , 'required': false
+        }
+        , {
+            'label': 'インデキシングモデル指定'
+            , 'desc': 'インデキシングに利用するモデル名を入力してください。デフォルトは "text-embedding-ada-002" です。'
+            , 'code': CONSTANTS.INDEXING_MODEL_ID
+            , 'type': FieldType.Text
+            , 'default': 'text-embedding-ada-002'
+            , 'required': false
+        }
+        , {
+            'label': 'ベクトル情報格納フィールドの指定'
+            , 'desc': 'インデキシングアプリの中でベクトル情報を格納している複数行テキストをフィールドコードで指定してください。'
+            , 'code': CONSTANTS.FIELDCODE_VECTORIZED
+            , 'type': FieldType.Text
+            , 'required': false
         }
     ]
 }

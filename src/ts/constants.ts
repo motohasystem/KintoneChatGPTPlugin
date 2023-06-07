@@ -27,10 +27,6 @@ export const CONSTANTS = {
     // 実行ボタン配置スペース
     , BTN_SPACE_FIELD: 'btn_space_field'
 
-    // レコード編集モード
-    , FLAG_RECORD_MODIFIER: 'flag_record_modifier'
-    , LABELS_RECORD_MODIFIER: ['enable', 'disable']
-
     // レスポンスの最長トークン
     , NUMBER_MAX_TOKENS: 'NUMBER_MAX_TOKENS'
 
@@ -44,6 +40,12 @@ export const CONSTANTS = {
         'role': '役割'
         , 'content': 'プロンプト'
     }
+
+    // embedding設定
+    , APPID_INDEXING: 'appid_indexing'
+    , EMBEDDING_API_KEY: 'embedding_api_key'
+    , INDEXING_MODEL_ID: 'indexigin_model_id'
+    , FIELDCODE_VECTORIZED: 'fieldcode_vectorized'
 };
 
 // export type fewshots_keys =  keyof typeof CONSTANTS.TABLE_FEWSHOTS
