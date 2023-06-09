@@ -1,4 +1,4 @@
-[<img src="img/kintanlab.png" width="70%">]((https://www.monosus.co.jp/service/kintanlab/))
+[<img src="img/kintanlab.png" width="70%">](https://www.monosus.co.jp/service/kintanlab/)
 
 ChatGPT連携プラグイン
 ====
