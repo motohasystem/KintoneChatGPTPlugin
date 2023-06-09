@@ -113,25 +113,24 @@ export class Settings {
             , 'desc': 'embedding機能を利用する際の設定項目です。通常は設定不要です。利用方法については、キン担ラボまでお問い合わせください。'
             , 'type': FieldType.Label
         }
-
         , {
-            'label': 'インデキシングアプリID'
-            , 'desc': 'ベクトル情報を格納しているアプリのIDを指定してください。'
-            , 'code': CONSTANTS.APPID_INDEXING
-            , 'type': FieldType.Number
-            , 'required': false
-        }
-        , {
-            'label': 'インデキシングモデル指定'
-            , 'desc': 'インデキシングに利用するモデル名を入力してください。デフォルトは "text-embedding-ada-002" です。'
+            'label': 'ベクトル化モデル指定'
+            , 'desc': 'アプリ情報のベクトル化に利用するモデル名を入力してください。デフォルトは "text-embedding-ada-002" です。'
             , 'code': CONSTANTS.INDEXING_MODEL_ID
             , 'type': FieldType.Text
             , 'default': 'text-embedding-ada-002'
             , 'required': false
         }
         , {
+            'label': 'ベクトルビルダーアプリID'
+            , 'desc': 'ベクトルビルダープラグインを適用したアプリのIDを指定してください。'
+            , 'code': CONSTANTS.APPID_INDEXING
+            , 'type': FieldType.Number
+            , 'required': false
+        }
+        , {
             'label': 'ベクトル情報格納フィールドの指定'
-            , 'desc': 'インデキシングアプリの中でベクトル情報を格納している複数行テキストをフィールドコードで指定してください。'
+            , 'desc': '指定したベクトルビルダーアプリの中で、ベクトル情報を格納している複数行テキストフィールドのフィールドコードを入力してください。'
             , 'code': CONSTANTS.FIELDCODE_VECTORIZED
             , 'type': FieldType.Text
             , 'required': false

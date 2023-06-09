@@ -73,7 +73,7 @@ export class ChatGPTConnector {
 
         // embedding設定
         this.appid_indexing = conf[CONSTANTS.APPID_INDEXING] as string  // 未定義の場合はembedding無効フラグとして扱う
-        console.log(this.appid_indexing)
+        console.log({ appid_indexing: this.appid_indexing })
         this.indexing_model_id = conf[CONSTANTS.INDEXING_MODEL_ID] as string
         this.fieldcode_vectorized = conf[CONSTANTS.FIELDCODE_VECTORIZED] as string
     }
@@ -155,7 +155,19 @@ export class ChatGPTConnector {
                 }
 
                 return
-            }).finally(() => {
+            })
+            .catch((error) => {
+                console.log("caught an error on run()")
+                console.log({ error })
+                if (this.fc_output_field == undefined) {
+                    console.error('設定が不十分です。出力フィールドが未指定です。')
+                    return
+                }
+                const message = `エラーが発生しました: ${error}`
+                this.setFieldContent(this.fc_output_field, message)
+                return
+            })
+            .finally(() => {
                 this.hideSpinner()
             })
     }
@@ -192,13 +204,11 @@ export class ChatGPTConnector {
         const method = "POST"
         const headers = {
             'Content-Type': 'application/json',
-            // 'Authorization': 'Bearer ' + this.api_key
         }
 
         if (this.model_id == undefined || this.model_id == "") {
             throw new Error(`指定されたChatGPTのモデル名[${this.model_id}]が不適切です。`)
         }
-        // const max_tokens = parseInt(this.max_tokens)
 
         return this.getEmbeddings(
             this.appid_indexing
@@ -215,22 +225,32 @@ export class ChatGPTConnector {
             }
             console.log({ data })
             return kintone.plugin.app.proxy(pluginId, url, method, headers, data)
+        }).catch((error) => {
+            console.log("caught an error on request()")
+            return Promise.reject(error)
         })
 
     }
 
     // embeddingする情報を、指定したappidのアプリから取得します
     getEmbeddings(appid: string | undefined, model: string | undefined, fc_vectors: string | undefined, prompt: string = "") {
-        if (appid == undefined || model == undefined) {
+        console.log({ appid: appid })
+        console.log({ model })
+        if (appid == undefined || appid.length == 0 || model == undefined) {
             console.warn(`getEmbeddings(): embedせずに実行します。(appid:${appid}, model:${model})`)
             return Promise.resolve(prompt)
         }
 
         if (fc_vectors == undefined) {
-            throw new Error('getEmbeddings(): ベクトル格納フィールドが未指定です。')
+            // throw new Error('getEmbeddings(): ベクトル格納フィールドが未指定です。')
+            return Promise.reject('getEmbeddings(): ベクトル格納フィールドが未指定です。')
         }
 
-        const embeddedPrompt = this.getEmbeddedPrompt(appid, prompt, 3)
+        const embeddedPrompt = this.getEmbeddedPrompt(appid, prompt, 3).catch((error) => {
+            console.log("caught an error on getEmbeddings()")
+            console.log({ error })
+            return Promise.reject(error)
+        })
         return Promise.resolve(embeddedPrompt)
     }
 

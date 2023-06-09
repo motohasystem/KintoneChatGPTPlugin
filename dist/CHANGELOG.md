@@ -1,6 +1,12 @@
 
 # Change log
 
+## [1.0.1] - 2023-06-09
+
+### Fixed
+- Fixed errors that occur when embedding functionality is not used
+- Avoided database lock errors that occurred at certain times
+
 ## [1.0] - 2023-06-07
 ### Changed
 - Organize items and comments on the settings screen

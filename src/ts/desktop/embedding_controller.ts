@@ -81,7 +81,7 @@ export class EmbeddingController {
 
 
     // 与えた文章をベクトル化する
-    async vectorize(input: string): Promise<number[]> {
+    vectorize(input: string): Promise<number[]> {
         if (this.openai != undefined) {
             return this.vectorizeByOpenAI(input)
         }
@@ -112,14 +112,18 @@ export class EmbeddingController {
             "model": this.model_vectorize
             , "input": searchquery
         }
+        console.log({ url })
         console.log({ data })
-        // return kintone.plugin.app.proxy(pluginId, url, method, headers, data)
-
         return kintone.plugin.app.proxy(pluginId, url, method, headers, data)
             .then((response) => {
                 console.log({ response })
                 const result: any = JSON.parse(response[0])
                 console.log({ result })
+                if ('error' in result) {
+                    const msg = `Error on kintone.plugin.app.proxy(): ${result['error']['message']}`
+                    return Promise.reject(msg)
+                    // throw new Error(result['error']['message'])
+                }
                 const query_vector = result['data'][0]['embedding'] as number[]
 
                 return Promise.resolve(query_vector)
@@ -179,7 +183,7 @@ export class EmbeddingController {
 
 
     async pickupEmbeddings(query_vector: string, vectors: VectorizedDB, embed_count: number) {
-        // TODO: vectors.recordsからsearch(embedding_controllerを参照)して、
+        // vectors.recordsからsearch(embedding_controllerを参照)して、
         // 指定した数の元文章と、vectors.headersをセットで返す
         return await this.search(query_vector, vectors.records, embed_count)
             .then((answers: string[]) => {
@@ -188,6 +192,12 @@ export class EmbeddingController {
                 const headers = vectors.headers.text
                 answers.unshift(headers)
                 return Promise.resolve(answers)
+            })
+            .catch((error) => {
+                const msg = `caught an error on pickupEmbeddings(): ${error}`
+                console.log({ msg })
+                // throw new Error(error)
+                return Promise.reject(msg)
             })
 
     }
