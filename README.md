@@ -58,7 +58,7 @@ embedding機能の利用については追加プラグインが必要になる�
 
 
 ## 1-2. プラグインのインストール
-- [Release / v1.0](https://github.com/motohasystem/KintoneChatGPTPlugin/releases/tag/v1.0)をダウンロードしてkintoneアプリに適用してください。
+- [Release / latest](https://github.com/motohasystem/KintoneChatGPTPlugin/releases/latest)をダウンロードしてkintoneアプリに適用してください。
 
 
 # 2. プラグインの設定
