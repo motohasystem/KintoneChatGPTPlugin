@@ -102,28 +102,27 @@ export class ChatGPTConnector {
         // space_field?.appendChild(spinner)
     }
 
-    run = async () => {
+    run = async (_clickevent: any) => {
+
         console.log('call chatGPT!')
         this.showSpinner()
 
-        if (this.fc_input_field == undefined) {
-            console.error(`必須設定に undefined が残っています。/ fc_input_field: ${this.fc_input_field}`)
+        if (this.fc_input_field == undefined || this.fc_output_field == undefined) {
+            console.error(`必須設定に undefined が残っています。/ fc_input_field: ${this.fc_input_field}  fc_output_field: ${this.fc_output_field}`)
             return
         }
 
-        const prompt: string = ((flag: boolean) => {
-            if (flag) {
-                // レコード編集モード
-                const record = kintone.app.record.get()
-                console.log('---- mode: record modifier')
-                // console.log({ record })
-                return JSON.stringify(record)
+        let prompt
+        try {
+            prompt = this.makePrompt(this.flag_record_modifier)
+            if (prompt == undefined) {
+                throw new Error('プロンプトの構築に失敗しました。')
             }
-            else {
-                // 通常モード
-                return this.getFieldContent(this.fc_input_field)
-            }
-        })(this.flag_record_modifier)
+        } catch (error) {
+            this.setFieldContent(this.fc_output_field, `エラーが発生しました。(${error})`)
+            this.hideSpinner()
+            return
+        }
 
         // // リクエスト実行と返り値の処理
         this.request(prompt)
@@ -172,25 +171,51 @@ export class ChatGPTConnector {
             })
     }
 
+    makePrompt(flag: boolean): string | undefined {
+        if (this.fc_input_field == undefined) {
+            return undefined
+        }
 
+        if (flag) {
+            // レコード編集モード
+            const record = kintone.app.record.get()
+            console.log('---- mode: record modifier')
+            // console.log({ record })
+            return JSON.stringify(record)
+        }
+        else {
+            // 通常モード
+            return this.getFieldContent(this.fc_input_field)
+        }
+    }
 
-    getFieldContent(fc: string) {
+    getFieldContent(fc: string): string {
         const record = kintone.app.record.get() as any
         if (record == null) {
             throw new Error('レコード情報が取得できません。')
         }
 
-        console.log({ record })
-        const text = record.record[fc].value
-        console.log({ text })
+        if (fc in record.record) {
+            const text = record.record[fc].value
+            return text
+        }
 
-        return text
+        throw new Error(`フィールドコード[${fc}]が見つかりません。フィールド設定またはプラグイン設定を見直してください。`)
+
     }
 
     setFieldContent(fc: string, content: string) {
         const current = kintone.app.record.get() as any
-        current.record[fc].value = content
-        kintone.app.record.set(current)
+        if (fc in current.record) {
+            current.record[fc].value = content
+            kintone.app.record.set(current)
+        }
+        else {
+            // エラー出力先のフィールドが見つからない状況なのでアラートダイアログで代用
+            const msg = `⛔[ERROR] フィールドコード[${fc}]が見つかりません。フィールド設定またはプラグイン設定を見直してください。`
+            console.error(msg)
+            alert(msg)
+        }
     }
 
     request(prompt: string) {

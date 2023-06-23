@@ -1,6 +1,10 @@
 
 # Change log
 
+## [1.0.2] - 2023-06-23
+### Fixed
+- Catch errors that occur when changing field codes after setting up the plugin
+
 ## [1.0.1] - 2023-06-09
 
 ### Fixed
