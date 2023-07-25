@@ -1,6 +1,15 @@
 
 # Change log
 
+## [1.1.0] - 2023-07-25
+### Changed
+- Added a one-line text field as a candidate output field.
+
+### Added
+- Added setting to allow specifying the label of the call button.
+- Added temperature parameter setting.
+- Added top_p parameter setting.
+
 ## [1.0.2] - 2023-06-23
 ### Fixed
 - Catch errors that occur when changing field codes after setting up the plugin

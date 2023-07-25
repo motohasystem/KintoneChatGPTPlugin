@@ -1,42 +1,41 @@
 {
-  "manifest_version": 1,
-  "version": "0.5.0",
-  "type": "APP",
-  "name": {
-    "en": "DEBUGMODE_ChatGptPlugin"
-  },
-  "icon": "image/shadow_shark.png",
-  "description": {
-    "en": "DEBUGMODE_ChatGptPlugin"
-  },
-  "homepage_url": {
-    "ja": "https://www.monosus.co.jp/service/kintanlab/",
-    "en": "https://www.monosus.co.jp/service/kintanlab/",
-    "zh": "https://www.monosus.co.jp/service/kintanlab/"
-  },
-  "desktop": {
-    "js": [
-      "https://localhost:7760/js/desktop.js"
-    ],
-    "css": [
-      "css/51-modern-default.css",
-      "css/micromodal-outside.css",
-      "https://localhost:7760/css/desktop.css"
-    ]
-  },
-  "config": {
-    "html": "html/config.html",
-    "js": [
-      "https://localhost:7760/js/config.js"
-    ],
-    "css": [
-      "css/51-modern-default.css",
-      "https://localhost:7760/css/config.css"
-    ],
-    "required_params": [
-      "config"
-    ]
-  },
-  "mobile": {
-  }
+    "manifest_version": 1,
+    "version": "0.5.0",
+    "type": "APP",
+    "name": {
+        "en": "DEBUGMODE_ChatGptPlugin"
+    },
+    "icon": "image/shadow_shark.png",
+    "description": {
+        "en": "DEBUGMODE_ChatGptPlugin"
+    },
+    "homepage_url": {
+        "ja": "https://www.monosus.co.jp/service/kintanlab/",
+        "en": "https://www.monosus.co.jp/service/kintanlab/",
+        "zh": "https://www.monosus.co.jp/service/kintanlab/"
+    },
+    "desktop": {
+        "js": [
+            "https://localhost:7760/js/desktop.js"
+        ],
+        "css": [
+            "css/51-modern-default.css",
+            "css/micromodal-outside.css",
+            "https://localhost:7760/css/desktop.css"
+        ]
+    },
+    "config": {
+        "html": "html/config.html",
+        "js": [
+            "https://localhost:7760/js/config.js"
+        ],
+        "css": [
+            "css/51-modern-default.css",
+            "https://localhost:7760/css/config.css"
+        ],
+        "required_params": [
+            "config"
+        ]
+    },
+    "mobile": {}
 }

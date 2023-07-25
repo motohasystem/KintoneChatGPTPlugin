@@ -11,6 +11,19 @@ export class Settings {
 
     static input: KintoneConfigSetting = [
         {
+            'label': 'ChatGPT呼び出しボタンのラベル'
+            , 'desc': 'プラグインを実行する際のボタンです。プロンプトに見合った名前に書き換えてください。'
+            , 'code': CONSTANTS.BUTTON_FACE
+            , 'type': FieldType.Text
+            , 'default': 'ChatGPTに聞く'
+            , 'required': true
+        }
+        , {
+            'label': ''
+            , 'desc': '=============================================='
+            , 'type': FieldType.Separator
+        }
+        , {
             'label': 'OpenAI APIの設定'
             , 'desc': 'API呼び出しに必要な項目を指定します。'
             , 'type': FieldType.Label
@@ -32,14 +45,6 @@ export class Settings {
             , 'code': CONSTANTS.MODEL_ID
             , 'type': FieldType.Text
             , 'default': 'gpt-3.5-turbo'
-            , 'required': true
-        }
-        , {
-            'label': 'MAX Tokens'
-            , 'desc': 'レスポンスの最大トークン長を指定してください。'
-            , 'code': CONSTANTS.NUMBER_MAX_TOKENS
-            , 'type': FieldType.Number
-            , 'default': '1024'
             , 'required': true
         }
         , {
@@ -75,6 +80,42 @@ export class Settings {
             , 'type': FieldType.Separator
         }
         , {
+            'label': 'ChatGPT APIのパラメータ設定'
+            , 'desc': 'ChatGPTを呼び出す際の数値パラメータを設定します。基本的にデフォルトのままでOKです。'
+            , 'type': FieldType.Label
+        }
+        , {
+            'label': 'MAX Tokens'
+            , 'desc': 'レスポンスの最大トークン長を指定してください。デフォルトは1024です。'
+            , 'code': CONSTANTS.NUMBER_MAX_TOKENS
+            , 'type': FieldType.Number
+            , 'default': '1024'
+            , 'required': true
+        }
+        , {
+            'label': 'Temperature'
+            , 'desc': '生成されるテキストのランダム性を制御するパラメータ、値が高いほど出力はランダムになり、低いほど確定的になります。0~2の間で指定してください。デフォルトは1.0です。'
+            , 'code': CONSTANTS.NUMBER_TEMPERATURE
+            , 'type': FieldType.Number
+            , 'default': '1.0'
+            , 'required': true
+        }
+        , {
+            'label': 'Top P'
+            , 'desc': '確率の高いトークンから順に並べて、累積確率がtop_pを超えるところまでのトークンのみを考慮するパラメータです。0~1.0の間で指定してください。数値を小さくすることで出力のブレを小さくできます。デフォルトは最大値である1.0です。'
+            , 'code': CONSTANTS.NUMBER_TOP_P
+            , 'type': FieldType.Number
+            , 'default': '1.0'
+            , 'required': true
+        }
+
+
+        , {
+            'label': ''
+            , 'desc': '=============================================='
+            , 'type': FieldType.Separator
+        }
+        , {
             'label': 'kintoneのフィールド設定'
             , 'desc': 'ChatGPTに問い合わせる入力フィールドと、回答を出力する出力フィールド、実行ボタン配置用のスペースIDを設定します。'
             , 'type': FieldType.Label
@@ -92,7 +133,7 @@ export class Settings {
             , 'desc': 'ChatGPTの返答を入力するフィールドを選択してください。'
             , 'code': CONSTANTS.OUTPUT_FIELD
             , 'type': FieldType.Dropdown_FieldSelect
-            , 'accept': ['MULTI_LINE_TEXT']
+            , 'accept': ['SINGLE_LINE_TEXT', 'MULTI_LINE_TEXT']
             , 'required': true
         }
         , {

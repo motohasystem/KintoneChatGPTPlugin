@@ -1,45 +1,42 @@
 {
-  "manifest_version": 1,
-  "version": "0.5.0",
-  "type": "APP",
-  "name": {
-    "en": "[staging] ChatGptPlugin",
-    "ja": "[staging] ChatGptPlugin"
-  },
-  "icon": "image/shadow_shark.png",
-  "description": {
-    "en": "[staging]  It is a staging build.",
-    "ja": "[staging] 開発用です。本番環境には適用しないでください。"
-  },
-  "homepage_url": {
-    "ja": "https://www.monosus.co.jp/service/kintanlab/",
-    "en": "https://www.monosus.co.jp/service/kintanlab/",
-    "zh": "https://www.monosus.co.jp/service/kintanlab/"
-  },
-  "desktop": {
-    "js": [
-      "js/desktop.js"
-    ],
-    "css": [
-      "css/51-modern-default.css",
-      "css/micromodal-outside.css",
-      "css/desktop.css"
-    ]
-  },
-  "config": {
-    "html": "html/config.html",
-    "js": [
-      "js/config.js"
-    ],
-    "css": [
-      "css/51-modern-default.css",
-      "css/config.css"
-    ],
-    "required_params": [
-      "config"
-    ]
-  },
-  "mobile": {
-  }
-
+    "manifest_version": 1,
+    "version": "1.1.0",
+    "type": "APP",
+    "name": {
+        "en": "ChatGptPlugin - kin-tan-lab",
+        "ja": "ChatGPT連携プラグイン - キン担ラボ"
+    },
+    "icon": "image/shadow_shark.png",
+    "description": {
+        "en": "Specify fields for prompts and output result fields and write the results via ChatGPT.",
+        "ja": "プロンプト用フィールドと出力結果フィールドを指定して、ChatGPTを経由した結果を書き出します。"
+    },
+    "homepage_url": {
+        "ja": "https://www.monosus.co.jp/service/kintanlab/",
+        "en": "https://www.monosus.co.jp/service/kintanlab/",
+        "zh": "https://www.monosus.co.jp/service/kintanlab/"
+    },
+    "desktop": {
+        "js": [
+            "js/desktop.js"
+        ],
+        "css": [
+            "css/51-modern-default.css",
+            "css/desktop.css"
+        ]
+    },
+    "config": {
+        "html": "html/config.html",
+        "js": [
+            "js/config.js"
+        ],
+        "css": [
+            "css/51-modern-default.css",
+            "css/config.css"
+        ],
+        "required_params": [
+            "config"
+        ]
+    },
+    "mobile": {}
 }

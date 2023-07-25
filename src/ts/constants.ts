@@ -6,6 +6,9 @@ export const CONSTANTS = {
     // 分類が未選択の場合に表示する文字列
     , EMPTY_LABEL: "----"
 
+    // ChatGPT呼び出しボタンの表記
+    , BUTTON_FACE: 'BUTTON_FACE'
+
     // API Key
     , API_KEY: 'api_key'
 
@@ -29,6 +32,12 @@ export const CONSTANTS = {
 
     // レスポンスの最長トークン
     , NUMBER_MAX_TOKENS: 'NUMBER_MAX_TOKENS'
+
+    // Temperatureの値
+    , NUMBER_TEMPERATURE: 'NUMBER_TEMPERATURE'
+
+    // Top_pの値
+    , NUMBER_TOP_P: 'NUMBER_TOP_P'
 
     // systemロールのプロンプト
     , SYSTEM_PROMPT: 'system_prompt'

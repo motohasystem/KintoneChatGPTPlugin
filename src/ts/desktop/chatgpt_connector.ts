@@ -27,6 +27,8 @@ export class ChatGPTConnector {
     api_endpoint: string;
     flag_record_modifier: boolean;
     max_tokens: string = "256"
+    temperature: string = "1.0"
+    top_p: string = "1.0"
 
     system_prompt: string | undefined
     messages: { [key: string]: string }[] | undefined
@@ -61,6 +63,13 @@ export class ChatGPTConnector {
         this.fc_output_field = conf[CONSTANTS.OUTPUT_FIELD] as string
         this.space_btn_field = conf[CONSTANTS.BTN_SPACE_FIELD] as string
         this.max_tokens = conf[CONSTANTS.NUMBER_MAX_TOKENS] == undefined ? "256" : conf[CONSTANTS.NUMBER_MAX_TOKENS] as string
+        this.temperature = conf[CONSTANTS.NUMBER_TEMPERATURE] == undefined ? "1.0" : conf[CONSTANTS.NUMBER_TEMPERATURE] as string
+        this.top_p = conf[CONSTANTS.NUMBER_TOP_P] == undefined ? "1.0" : conf[CONSTANTS.NUMBER_TOP_P] as string
+
+        // 呼び出しボタンのラベル
+        if (conf[CONSTANTS.BUTTON_FACE] as string != '') {
+            this.BUTTON_LABEL = conf[CONSTANTS.BUTTON_FACE] as string
+        }
 
         // ChatGPTのモデル名
         this.model_id = conf[CONSTANTS.MODEL_ID] as string
@@ -235,6 +244,10 @@ export class ChatGPTConnector {
             throw new Error(`指定されたChatGPTのモデル名[${this.model_id}]が不適切です。`)
         }
 
+        const max_tokens = parseInt(this.max_tokens)
+        const temperature = parseFloat(this.temperature)
+        const top_p = parseFloat(this.top_p)
+
         return this.getEmbeddings(
             this.appid_indexing
             , this.indexing_model_id
@@ -245,8 +258,9 @@ export class ChatGPTConnector {
             const data = {
                 "model": this.model_id,
                 "messages": messages,
-                // "max_tokens": max_tokens,
-                // "temperature": 0.7
+                "max_tokens": max_tokens,
+                "temperature": temperature,
+                "top_p": top_p
             }
             console.log({ data })
             return kintone.plugin.app.proxy(pluginId, url, method, headers, data)
