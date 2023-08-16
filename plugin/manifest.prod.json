@@ -1,15 +1,15 @@
 {
     "manifest_version": 1,
-    "version": "1.1.0",
+    "version": "2.0.0",
     "type": "APP",
     "name": {
-        "en": "ChatGptPlugin - kin-tan-lab",
-        "ja": "ChatGPT連携プラグイン - キン担ラボ"
+        "en": "ChattyTone - kin-tan-lab",
+        "ja": "ChattyTone - キン担ラボ"
     },
-    "icon": "image/shadow_shark.png",
+    "icon": "image/chattytone_icon.png",
     "description": {
-        "en": "Specify fields for prompts and output result fields and write the results via ChatGPT.",
-        "ja": "プロンプト用フィールドと出力結果フィールドを指定して、ChatGPTを経由した結果を書き出します。"
+        "en": "It infuses new functionality into kintone by linking with ChatGPT.",
+        "ja": "ChatGPTと連携することでkintoneに新たな機能を吹き込みます。名称を「ChatGPT連携プラグイン」から変更しました。"
     },
     "homepage_url": {
         "ja": "https://www.monosus.co.jp/service/kintanlab/",

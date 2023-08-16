@@ -1,9 +1,7 @@
-[<img src="img/kintanlab.png" width="70%">](https://www.monosus.co.jp/service/kintanlab/)
-
-ChatGPT連携プラグイン
+<img src="./plugin/image/chattytone_icon.png" width="30%"/> ChattyToneプラグイン
 ====
 
-- [ChatGPT連携プラグイン](#chatgpt連携プラグイン)
+- [ ChattyToneプラグイン](#-chattytoneプラグイン)
 - [概要](#概要)
     - [入力画面](#入力画面)
     - [設定画面](#設定画面)
@@ -14,13 +12,14 @@ ChatGPT連携プラグイン
 - [2. プラグインの設定](#2-プラグインの設定)
     - [2-1. OpenAI APIの設定](#2-1-openai-apiの設定)
     - [2-2. ChatGPT APIのパラメータ設定](#2-2-chatgpt-apiのパラメータ設定)
-    - [2-2. フィールド設定](#2-2-フィールド設定)
+    - [2-2. kintoneのフィールド設定](#2-2-kintoneのフィールド設定)
     - [2-3. embedding設定](#2-3-embedding設定)
 - [3. License](#3-license)
 - [4. このプラグインについて](#4-このプラグインについて)
 
-
 # 概要
+
+ChatGPT連携プラグインから名前を変更しました。
 
 ## 入力画面
 
@@ -73,6 +72,11 @@ embedding機能の利用については追加プラグインが必要になる�
 - ChatGPT呼び出しボタンのラベル*
     - プラグインを実行する際のボタンです。プロンプトに見合った名前に書き換えてください。
 
+- スピーチエディットモード
+    - プロンプトに書き込んだ文章をChatGPTが判断して直接レコードを書き換えるモードです。通常は無効にしておいてください。
+    - 有効にすると、「氏名を権兵衛にしてください」というプロンプトで氏名フィールドを「権兵衛」に書き換えます。
+    - 書き換えるフィールドはフィールドコードで判断します。「氏名」フィールドはフィールドコードを「氏名」としてください。
+
 ## 2-1. OpenAI APIの設定
 
 API呼び出しに必要な項目を指定します。TemperatureやTop Pの指定にはまだ対応していません。（次回のアップデートで追加予定です）
@@ -115,9 +119,9 @@ ChatGPTを呼び出す際の数値パラメータを設定します。基本的�
     - 数値を小さくすることで出力のブレを小さくできます。
     - 0~1.0の間で指定してください。デフォルトは最大値である1.0です。
 
-## 2-2. フィールド設定
+## 2-2. kintoneのフィールド設定
 
-kintoneアプリのフォームから、入力と出力に使うフィールドを指定します。すべて必須の設定です。
+kintoneアプリのフォーム設定のなかから、入力と出力に使うフィールドを指定します。すべて必須の設定です。
 
 - 入力フィールド選択*
     - 入力として使用するテキストフィールドを選択してください
@@ -151,7 +155,7 @@ embeddingを利用したい場合はキン担ラボまでお問い合わせく�
 
 # 3. License
 
-ChatGPTプラグインはMITライセンスの元で公開しています。
+ChattyToneプラグインはMITライセンスの元で公開しています。
 This plugin is licensed under MIT license.
 
 Copyright (c) 2023 Daisuke Motohashi
@@ -160,3 +164,6 @@ https://opensource.org/licenses/MIT
 # 4. このプラグインについて
 
 このプラグインは株式会社モノサスの[キン担ラボ](https://www.monosus.co.jp/service/kintanlab/)活動の一環として作成しました。
+
+[<img src="img/kintanlab.png" width="70%">](https://www.monosus.co.jp/service/kintanlab/)
+

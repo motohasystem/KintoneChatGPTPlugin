@@ -50,6 +50,13 @@ export const CONSTANTS = {
         , 'content': 'プロンプト'
     }
 
+    // スピーチエディットモードのラベル
+    , MODE_SPEECH_EDIT: 'mode_speech_edit'
+    , LABELS_SPEECH_EDIT: {
+        disable: '無効',
+        enable: '有効'
+    }
+
     // embedding設定
     , APPID_INDEXING: 'appid_indexing'
     , EMBEDDING_API_KEY: 'embedding_api_key'

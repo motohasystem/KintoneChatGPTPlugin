@@ -11,6 +11,7 @@ import { Record } from '@kintone/rest-api-client/lib/client/types'
 import { KintoneRestAPIClient } from '@kintone/rest-api-client'
 import "@shin-chan/kypes";  // kintone types
 import { EmbeddingController, VectorizedDB } from './embedding_controller';
+import { FunctionCallingProcessor } from './function_calling_processor';
 
 export class ChatGPTConnector {
     BUTTON_LABEL = 'ChatGPTに聞く'
@@ -25,7 +26,7 @@ export class ChatGPTConnector {
     space_btn_field: string | undefined;
     model_id: string | undefined;
     api_endpoint: string;
-    flag_record_modifier: boolean;
+    flag_speech_edit: boolean;
     max_tokens: string = "256"
     temperature: string = "1.0"
     top_p: string = "1.0"
@@ -39,7 +40,7 @@ export class ChatGPTConnector {
     fieldcode_vectorized: string | undefined
 
     constructor(conf: ConfigDict) {
-        this.flag_record_modifier = false
+        this.flag_speech_edit = false        // レコードを直接編集するモードフラグ
 
         this.conf = undefined
         this.loadConfig(conf)
@@ -62,12 +63,16 @@ export class ChatGPTConnector {
         this.fc_input_field = conf[CONSTANTS.INPUT_FIELD] as string
         this.fc_output_field = conf[CONSTANTS.OUTPUT_FIELD] as string
         this.space_btn_field = conf[CONSTANTS.BTN_SPACE_FIELD] as string
+
+        const mode_speech_edit = conf[CONSTANTS.MODE_SPEECH_EDIT] as string
+        this.flag_speech_edit = mode_speech_edit == CONSTANTS.LABELS_SPEECH_EDIT.enable
+
         this.max_tokens = conf[CONSTANTS.NUMBER_MAX_TOKENS] == undefined ? "256" : conf[CONSTANTS.NUMBER_MAX_TOKENS] as string
         this.temperature = conf[CONSTANTS.NUMBER_TEMPERATURE] == undefined ? "1.0" : conf[CONSTANTS.NUMBER_TEMPERATURE] as string
         this.top_p = conf[CONSTANTS.NUMBER_TOP_P] == undefined ? "1.0" : conf[CONSTANTS.NUMBER_TOP_P] as string
 
         // 呼び出しボタンのラベル
-        if (conf[CONSTANTS.BUTTON_FACE] as string != '') {
+        if (conf[CONSTANTS.BUTTON_FACE] != undefined && conf[CONSTANTS.BUTTON_FACE] as string != '') {
             this.BUTTON_LABEL = conf[CONSTANTS.BUTTON_FACE] as string
         }
 
@@ -123,7 +128,7 @@ export class ChatGPTConnector {
 
         let prompt
         try {
-            prompt = this.makePrompt(this.flag_record_modifier)
+            prompt = this.makePrompt(this.flag_speech_edit)
             if (prompt == undefined) {
                 throw new Error('プロンプトの構築に失敗しました。')
             }
@@ -133,21 +138,30 @@ export class ChatGPTConnector {
             return
         }
 
+        console.log({ prompt })
+
         // // リクエスト実行と返り値の処理
         this.request(prompt)
             .then((response) => {
                 console.log({ response })
                 if (this.fc_output_field == undefined) {
+                    console.error(`結果は得られましたが、出力フィールドが未定義です。(response: ${response})`)
                     return
                 }
 
-
-                if (this.flag_record_modifier) {
+                if (this.flag_speech_edit) {
                     console.log({ response })
                     if (response == undefined) {
                         throw new Error('ChatGPTConnector.run(): response is empty!')
                     }
-                    const record = JSON.parse(response[0])
+                    const processor = new FunctionCallingProcessor(response)
+
+                    const record = processor.makeSetRecord()
+                    console.log({ record })
+                    if (record == undefined) {
+                        throw new Error('function callingパラメータが定義できませんでした。')
+                    }
+                    // @ts-ignore
                     kintone.app.record.set(record)
                 }
                 else {
@@ -184,17 +198,21 @@ export class ChatGPTConnector {
         if (this.fc_input_field == undefined) {
             return undefined
         }
+        const prompt = this.getFieldContent(this.fc_input_field)
 
         if (flag) {
             // レコード編集モード
+            console.info('レコード編集モードで実行します。')
             const record = kintone.app.record.get()
             console.log('---- mode: record modifier')
             // console.log({ record })
-            return JSON.stringify(record)
+            const json = JSON.stringify(record)
+            return `${prompt}\n\n${json}`
         }
         else {
             // 通常モード
-            return this.getFieldContent(this.fc_input_field)
+            console.info('通常モードで実行します。')
+            return prompt
         }
     }
 
@@ -255,13 +273,20 @@ export class ChatGPTConnector {
             , prompt
         ).then((prompt: string) => {
             const messages = this.composeMessages(this.system_prompt, this.messages, prompt)
-            const data = {
+            const data: { [key: string]: any } = {
                 "model": this.model_id,
                 "messages": messages,
                 "max_tokens": max_tokens,
                 "temperature": temperature,
-                "top_p": top_p
+                "top_p": top_p,
             }
+
+            // function callingを使用する場合に付与するパラメータ
+            if (this.flag_speech_edit) {
+                data["functions"] = FunctionCallingProcessor.Functions
+                data["function_call"] = "auto"
+            }
+
             console.log({ data })
             return kintone.plugin.app.proxy(pluginId, url, method, headers, data)
         }).catch((error) => {

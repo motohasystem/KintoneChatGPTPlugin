@@ -19,6 +19,14 @@ export class Settings {
             , 'required': true
         }
         , {
+            'label': 'スピーチエディットモード'
+            , 'desc': 'プロンプトに書き込んだ文章をChatGPTが判断して直接レコードを書き換えるモードです。通常は無効にしておいてください。'
+            , 'code': CONSTANTS.MODE_SPEECH_EDIT
+            , 'type': FieldType.Radio
+            , 'accept': Object.values(CONSTANTS.LABELS_SPEECH_EDIT)
+            , 'default': CONSTANTS.LABELS_SPEECH_EDIT.disable
+        }
+        , {
             'label': ''
             , 'desc': '=============================================='
             , 'type': FieldType.Separator
@@ -122,7 +130,7 @@ export class Settings {
         }
         , {
             'label': '入力フィールド選択'
-            , 'desc': '入力として使用するフィールドを選択してください'
+            , 'desc': '入力として使用するフィールドを選択してください。スピーチエディットモードではこのフィールドをプロンプトとして扱います。'
             , 'code': CONSTANTS.INPUT_FIELD
             , 'type': FieldType.Dropdown_FieldSelect
             , 'accept': ['SINGLE_LINE_TEXT', 'MULTI_LINE_TEXT']
