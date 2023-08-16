@@ -71,7 +71,7 @@ module.exports = {
         new KintonePlugin({
             manifestJSONPath: './plugin/manifest.json',
             privateKeyPath: './private_prod.ppk',
-            pluginZipPath: './dist/ChatGptPlugin.zip'
+            pluginZipPath: './dist/ChattyTonePlugin.zip'
         })
         , new ForkTsCheckerWebpackPlugin()
         , new TerserPlugin({
