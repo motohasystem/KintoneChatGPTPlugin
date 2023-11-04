@@ -54,6 +54,12 @@
     height: initial !important;
 }
 
+/** bootstrap対策: 「レコードの一括削除」ダイアログ下部のボタンが半分沈む現象を回避 */
+.gaia-argoui-dialog-buttons-confirm {
+    box-sizing: content-box;
+}
+
+
 /* .field-evaluation {
     background-color: #DDDDFF;
 }
